@@ -39,6 +39,7 @@ class User
 
         User.new(user_hash.first)
     end
+
     
     attr_accessor :id, :fname, :lname
     
@@ -60,6 +61,14 @@ class User
         id = QuestionsDataBase.instance.last_insert_row_id
     end
 
+    def authored_questions
+        Question.find_by_author_id(self.id)
+    end
+
+    def authored_replies
+        Reply.find_by_user_id(self.id)
+    end
+
 end
 
 class Question
@@ -70,11 +79,11 @@ class Question
             SELECT 
                 *
             FROM
-                users
+                questions
             WHERE
                 id = ?;
         SQL
-        User.new(user_hash.first)
+        Question.new(user_hash.first)
     end
 
     def self.find_by_author_id(author_id)
@@ -112,8 +121,14 @@ class Question
                 (?, ?, ?)
             SQL
         id = QuestionsDataBase.instance.last_insert_row_id
+    end
 
+    def author
+        User.find_by_id(@author_id)
+    end
 
+    def replies
+        Reply.find_by_question_id
     end
 
 end
@@ -153,6 +168,22 @@ class QuestionFollow
 end
 
 class Reply
+
+    def self.find_by_question_id(question_id)
+        reply_hash = QuestionsDataBase.instance.execute(<<-SQL, question_id)
+            SELECT 
+                *
+            FROM 
+                replies
+            WHERE
+                question_id = ?
+        SQL
+        arr = []
+        reply_hash.each do |reply|
+            arr << Reply.new(reply)
+        end
+        arr
+    end
 
     def self.find_by_user_id(user_id)
         id_hash = QuestionsDataBase.instance.execute(<<-SQL, user_id)
