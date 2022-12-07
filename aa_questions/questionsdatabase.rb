@@ -155,7 +155,20 @@ end
 class Reply
 
     def self.find_by_user_id(user_id)
-
+        id_hash = QuestionsDataBase.instance.execute(<<-SQL, user_id)
+        
+            SELECT
+                *
+            FROM
+                replies
+            WHERE
+                user_id = ?
+        SQL
+        arr = []
+        id_hash.each do |id|
+            arr << Reply.new(id)
+        end
+        arr
     end
 
     def self.find_by_id(id)
