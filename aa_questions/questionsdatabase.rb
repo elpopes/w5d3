@@ -92,12 +92,46 @@ class Question
 end
 
 class QuestionFollow
+    attr_accessor :user_id, :question_id
+    def initialize(options)
+        @user_id = options["user_id"]
+        @question_id = options["question_id"]
+    end
 
+    def create
+        QuestionsDataBase.instance.execute(<<-SQL, user_id, question_id)
+            INSERT INTO
+                question_follows(user_id, question_id)
+            VALUES
+                (?, ?)
+        SQL
 
+        id = QuestionsDataBase.instance.last_insert_row_id     
+    end
+
+# THIS IS JUST TO GET ANOTHER PUSH GOING
 end
 
 class Reply
+    attr_accessor :id, :question_id, :parent_reply_id, :user_id, :body
+    def initialize(options)
+        @id = options['id']
+        @question_id = options['question_id']
+        @parent_reply_id = options['parent_reply_id']
+        @user_id = options['user_id']
+        @body = options['body']
+    end
 
+    def create
+        QuestionsDataBase.instance.execute(<<-SQL, id, question_id, parent_reply_id, user_id, body)
+        INSERT INTO
+            replies
+        VALUES
+            (?, ?, ?, ?, ?)
+        SQL
+
+        id = QuestionsDataBase.instance.last_insert_row_id
+    end
 end
 
 class QuestionLike
