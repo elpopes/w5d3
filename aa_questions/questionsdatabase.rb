@@ -61,6 +61,8 @@ class User
 
 
 
+
+
 end
 
 class Question
@@ -76,18 +78,21 @@ class Question
 
     def create                      # TEST WITHOUT @ for parameters becasue attr_accessor
         raise "#{self} is already in database" if @id
-        QuestionsDataBase.instance.execute(<<-SQL, @title, @body, @author_id)
+        QuestionsDataBase.instance.execute(<<-SQL, title, body, author_id)
             INSERT INTO
                 questions (title, body, author_id)
             VALUES
                 (?, ?, ?)
             SQL
         id = QuestionsDataBase.instance.last_insert_row_id
+
+
     end
 
 end
 
 class QuestionFollow
+
 
 end
 
