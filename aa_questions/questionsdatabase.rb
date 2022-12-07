@@ -128,7 +128,7 @@ class Question
     end
 
     def replies
-        Reply.find_by_question_id
+        Reply.find_by_question_id(@id)
     end
 
 end
@@ -168,6 +168,12 @@ class QuestionFollow
 end
 
 class Reply
+    def author
+        User.find_by_id(@id)
+    end
+    def question
+        Question.find_by_id(@id)
+    end
 
     def self.find_by_question_id(question_id)
         reply_hash = QuestionsDataBase.instance.execute(<<-SQL, question_id)
@@ -208,11 +214,11 @@ class Reply
             SELECT 
                 *
             FROM
-                users
+                replies
             WHERE
                 id = ?;
         SQL
-        User.new(user_hash.first)
+        Reply.new(user_hash.first)
     end
     
     attr_accessor :id, :question_id, :parent_reply_id, :user_id, :body
